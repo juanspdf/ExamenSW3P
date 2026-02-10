@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Socios - CoopAndes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-full {
+            grid-column: 1 / -1;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .search-input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏦 Sistema de Gestión de Socios</h1>
+            <p class="subtitle">CoopAndes - Cooperativa de Ahorro y Crédito</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Formulario -->
+            <div class="card">
+                <h2>📝 Registro de Socio</h2>
+                
+                <div id="alertContainer"></div>
+
+                <form id="socioForm">
+                    <input type="hidden" id="socioId">
+                    
+                    <div class="form-group">
+                        <label for="tipoIdentificacion">Tipo de Identificación *</label>
+                        <select id="tipoIdentificacion" required>
+                            <option value="CEDULA">Cédula</option>
+                            <option value="RUC">RUC</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="identificacion">Identificación *</label>
+                        <input type="text" id="identificacion" required maxlength="13" 
+                               placeholder="Ej: 1712345678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nombres">Nombres *</label>
+                        <input type="text" id="nombres" required maxlength="100" 
+                               placeholder="Ej: Juan Carlos">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos *</label>
+                        <input type="text" id="apellidos" required maxlength="100" 
+                               placeholder="Ej: Pérez García">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" maxlength="100" 
+                               placeholder="ejemplo@correo.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" maxlength="10" 
+                               placeholder="0987654321">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" maxlength="200" 
+                               placeholder="Av. Principal 123">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">
+                            💾 Guardar
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="limpiarFormulario()">
+                            🔄 Limpiar
+                        </button>
+                    </div>
+                </form>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn-danger btn-full" onclick="confirmarLimpiarTodo()">
+                        🗑️ Limpiar Todos los Socios
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de Socios -->
+            <div class="card">
+                <h2>👥 Lista de Socios</h2>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSocios">0</div>
+                        <div class="stat-label">Total Socios</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="sociosActivos">0</div>
+                        <div class="stat-label">Activos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="sociosInactivos">0</div>
+                        <div class="stat-label">Inactivos</div>
+                    </div>
+                </div>
+
+                <div class="search-section">
+                    <div class="search-input-group">
+                        <input type="text" id="buscarIdentificacion" 
+                               placeholder="Buscar por identificación (cédula o RUC)">
+                        <button class="btn-primary" onclick="buscarPorIdentificacion()">
+                            🔍 Buscar
+                        </button>
+                    </div>
+                    <button class="btn-secondary btn-full" onclick="cargarSocios()">
+                        📋 Mostrar Todos
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Identificación</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaSocios">
+                            <tr>
+                                <td colspan="7" class="loading">Cargando socios...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/socios';
+        let modoEdicion = false;
+
+        // Cargar socios al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarSocios();
+        });
+
+        // Manejar envío del formulario
+        document.getElementById('socioForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const socio = {
+                identificacion: document.getElementById('identificacion').value,
+                nombres: document.getElementById('nombres').value,
+                apellidos: document.getElementById('apellidos').value,
+                email: document.getElementById('email').value || null,
+                telefono: document.getElementById('telefono').value || null,
+                direccion: document.getElementById('direccion').value || null,
+                tipoIdentificacion: document.getElementById('tipoIdentificacion').value
+            };
+
+            try {
+                let response;
+                const socioId = document.getElementById('socioId').value;
+
+                if (modoEdicion && socioId) {
+                    response = await fetch(`${API_URL}/${socioId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(socio)
+                    });
+                } else {
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(socio)
+                    });
+                }
+
+                if (response.ok) {
+                    mostrarAlerta(
+                        modoEdicion ? 'Socio actualizado exitosamente' : 'Socio creado exitosamente',
+                        'success'
+                    );
+                    limpiarFormulario();
+                    cargarSocios();
+                } else {
+                    const error = await response.json();
+                    mostrarAlerta(error.message || 'Error al guardar el socio', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión: ' + error.message, 'error');
+            }
+        });
+
+        // Cargar todos los socios
+        async function cargarSocios() {
+            try {
+                const response = await fetch(API_URL);
+                const socios = await response.json();
+                
+                actualizarEstadisticas(socios);
+                mostrarSocios(socios);
+            } catch (error) {
+                document.getElementById('tablaSocios').innerHTML = 
+                    '<tr><td colspan="7" style="text-align: center; color: red;">Error al cargar socios</td></tr>';
+            }
+        }
+
+        // Buscar socio por identificación
+        async function buscarPorIdentificacion() {
+            const identificacion = document.getElementById('buscarIdentificacion').value.trim();
+            
+            if (!identificacion) {
+                mostrarAlerta('Ingrese una identificación para buscar', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/identificacion/${identificacion}`);
+                
+                if (response.ok) {
+                    const socio = await response.json();
+                    mostrarSocios([socio]);
+                    actualizarEstadisticas([socio]);
+                } else {
+                    mostrarAlerta('Socio no encontrado', 'error');
+                    document.getElementById('tablaSocios').innerHTML = 
+                        '<tr><td colspan="7" style="text-align: center;">No se encontró ningún socio</td></tr>';
+                }
+            } catch (error) {
+                mostrarAlerta('Error al buscar el socio', 'error');
+            }
+        }
+
+        // Mostrar socios en la tabla
+        function mostrarSocios(socios) {
+            const tbody = document.getElementById('tablaSocios');
+            
+            if (socios.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay socios registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = socios.map(socio => `
+                <tr>
+                    <td>${socio.identificacion}</td>
+                    <td>${socio.nombres}</td>
+                    <td>${socio.apellidos}</td>
+                    <td>${socio.email || '-'}</td>
+                    <td>${socio.telefono || '-'}</td>
+                    <td>
+                        <span class="badge ${socio.activo ? 'badge-success' : 'badge-danger'}">
+                            ${socio.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-primary btn-small" onclick='editarSocio(${JSON.stringify(socio)})'>
+                            ✏️
+                        </button>
+                        <button class="btn-danger btn-small" onclick="eliminarSocio('${socio.id}')">
+                            🗑️
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Editar socio
+        function editarSocio(socio) {
+            modoEdicion = true;
+            document.getElementById('socioId').value = socio.id;
+            document.getElementById('identificacion').value = socio.identificacion;
+            document.getElementById('nombres').value = socio.nombres;
+            document.getElementById('apellidos').value = socio.apellidos;
+            document.getElementById('email').value = socio.email || '';
+            document.getElementById('telefono').value = socio.telefono || '';
+            document.getElementById('direccion').value = socio.direccion || '';
+            document.getElementById('tipoIdentificacion').value = socio.tipoIdentificacion;
+
+            // Scroll al formulario
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            mostrarAlerta('Modo edición activado', 'success');
+        }
+
+        // Eliminar socio
+        async function eliminarSocio(id) {
+            if (!confirm('¿Está seguro de eliminar este socio?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Socio eliminado exitosamente', 'success');
+                    cargarSocios();
+                } else {
+                    mostrarAlerta('Error al eliminar el socio', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+            }
+        }
+
+        // Limpiar formulario
+        function limpiarFormulario() {
+            document.getElementById('socioForm').reset();
+            document.getElementById('socioId').value = '';
+            modoEdicion = false;
+            document.getElementById('buscarIdentificacion').value = '';
+        }
+
+        // Limpiar todos los socios
+        async function confirmarLimpiarTodo() {
+            if (!confirm('⚠️ ADVERTENCIA: Esto eliminará TODOS los socios registrados. ¿Está seguro?')) return;
+            if (!confirm('¿Realmente desea continuar? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/limpiar-todo`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Todos los socios han sido eliminados', 'success');
+                    cargarSocios();
+                } else {
+                    mostrarAlerta('Error al limpiar los socios', 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error de conexión', 'error');
+            }
+        }
+
+        // Actualizar estadísticas
+        function actualizarEstadisticas(socios) {
+            const total = socios.length;
+            const activos = socios.filter(s => s.activo).length;
+            const inactivos = total - activos;
+
+            document.getElementById('totalSocios').textContent = total;
+            document.getElementById('sociosActivos').textContent = activos;
+            document.getElementById('sociosInactivos').textContent = inactivos;
+        }
+
+        // Mostrar alertas
+        function mostrarAlerta(mensaje, tipo) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${tipo}`;
+            alert.textContent = mensaje;
+            
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

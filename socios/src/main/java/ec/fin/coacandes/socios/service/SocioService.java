@@ -18,4 +18,6 @@ public interface SocioService {
     void eliminarSocio(UUID id);
 
     SocioResponseDTO obtenerSocioPorIdentificacion(String identificacion);
+
+    void eliminarTodos();
 }

@@ -1,0 +1,216 @@
+version: '3.8'
+
+# ============================================
+# OPCIÓN 2: Todo Dockerizado
+# ============================================
+# Incluye microservicios + bases de datos
+# Comando: docker-compose -f docker-compose.full.yml up -d
+# ============================================
+
+services:
+  # ==========================================
+  # MySQL para Microservicio de Cuentas
+  # ==========================================
+  mysql-cuentas:
+    image: mysql:8.0
+    container_name: cooperativa-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: cooperativa_cuentas
+      MYSQL_USER: cooperativa_user
+      MYSQL_PASSWORD: cooperativa123
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3307:3306"
+      - "33061:33060"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./microservicio-cuentas/mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - cooperativa-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+      start_period: 40s
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=500
+      - --innodb_buffer_pool_size=512M
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+
+  # ==========================================
+  # phpMyAdmin para gestión MySQL
+  # ==========================================
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: cooperativa-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      mysql-cuentas:
+        condition: service_healthy
+    environment:
+      PMA_HOST: mysql-cuentas
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 256M
+    ports:
+      - "8081:80"
+    networks:
+      - cooperativa-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  # ==========================================
+  # PostgreSQL para Microservicio de Socios
+  # ==========================================
+  postgres-socios:
+    image: postgres:16-alpine
+    container_name: cooperativa-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cooperativa_socios
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cooperativa-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cooperativa_socios"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+
+  # ==========================================
+  # Microservicio de Cuentas (NestJS)
+  # ==========================================
+  cuentas-service:
+    build:
+      context: ./microservicio-cuentas
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    image: cooperativa/cuentas-service:latest
+    container_name: cooperativa-cuentas-service
+    restart: unless-stopped
+    depends_on:
+      mysql-cuentas:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DB_TYPE: mysql
+      DB_HOST: mysql-cuentas
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root123
+      DB_DATABASE: cooperativa_cuentas
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - cooperativa-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api-docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
+    # Descomentar para desarrollo con hot-reload:
+    # volumes:
+    #   - ./microservicio-cuentas/src:/app/src:ro
+
+  # ==========================================
+  # Microservicio de Socios (Spring Boot)
+  # ==========================================
+  socios-service:
+    build:
+      context: ./socios
+      dockerfile: Dockerfile
+      args:
+        MAVEN_OPTS: "-Xmx512m"
+    image: cooperativa/socios-service:latest
+    container_name: cooperativa-socios-service
+    restart: unless-stopped
+    depends_on:
+      postgres-socios:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-socios:5432/cooperativa_socios
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8080
+      JAVA_OPTS: "-Xmx512m -Xms256m -XX:MaxMetaspaceSize=128m"
+    ports:
+      - "8080:8080"
+    networks:
+      - cooperativa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+          cpus: '1.5'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    # Descomentar para desarrollo con hot-reload (requiere spring-boot-devtools):
+    # volumes:
+    #   - ./socios/target:/app/target:ro
+
+# ==========================================
+# Volúmenes persistentes
+# ==========================================
+volumes:
+  mysql_data:
+    name: cooperativa_mysql_data
+    driver: local
+  postgres_data:
+    name: cooperativa_postgres_data
+    driver: local
+
+# ==========================================
+# Red común para todos los servicios
+# ==========================================
+networks:
+  cooperativa-network:
+    name: cooperativa-network
+    driver: bridge

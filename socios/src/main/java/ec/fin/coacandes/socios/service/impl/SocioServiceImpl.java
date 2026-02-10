@@ -82,4 +82,9 @@ public class SocioServiceImpl implements SocioService {
                 .orElseThrow(() -> new EntityNotFoundException("Socio no encontrado"));
         return modelMapper.map(socio, SocioResponseDTO.class);
     }
+
+    @Override
+    public void eliminarTodos() {
+        socioRepository.deleteAll();
+    }
 }

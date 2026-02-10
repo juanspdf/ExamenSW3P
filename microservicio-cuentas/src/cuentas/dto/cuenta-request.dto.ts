@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsPositive, IsEnum, IsUUID } from 'class-validator';
+import { IsString, IsNumber, IsPositive, IsEnum, IsUUID, IsNotEmpty } from 'class-validator';
 
 export class CuentaRequestDto {
   @ApiProperty({
@@ -7,6 +7,7 @@ export class CuentaRequestDto {
     example: '123e4567-e89b-12d3-a456-426614174000'
   })
   @IsString()
+  @IsNotEmpty()
   socioId: string; // PROBLEMA: No valida que exista
 
   @ApiProperty({
@@ -14,6 +15,7 @@ export class CuentaRequestDto {
     example: '001-123456789'
   })
   @IsString()
+  @IsNotEmpty()
   numeroCuenta: string;
 
   @ApiProperty({

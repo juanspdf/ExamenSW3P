@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Node & Cypress ###
+node_modules/
+package-lock.json
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+*.log
+npm-debug.log*

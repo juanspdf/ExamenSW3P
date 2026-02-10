@@ -2,9 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
+  // Configurar archivos estáticos desde la raíz del proyecto
+  app.useStaticAssets(join(process.cwd(), 'public'));
   
   // Configurar validación global
   app.useGlobalPipes(new ValidationPipe({
@@ -29,6 +34,7 @@ async function bootstrap() {
   
   await app.listen(3000);
   console.log('Microservicio de Cuentas ejecutándose en http://localhost:3000');
+  console.log('Formulario web disponible en http://localhost:3000');
   console.log('Swagger disponible en http://localhost:3000/api-docs');
 }
 bootstrap();

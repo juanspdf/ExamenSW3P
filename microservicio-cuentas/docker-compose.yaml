@@ -12,8 +12,8 @@ services:
       MYSQL_PASSWORD: cooperativa123
       MYSQL_ROOT_HOST: '%'
     ports:
-      - "3306:3306"
-      - "33060:33060"  # Para herramientas externas
+      - "3307:3306"  # Puerto 3307 en el host para evitar conflicto con MySQL local
+      - "33061:33060"  # Para herramientas externas
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d  # Para scripts de inicialización

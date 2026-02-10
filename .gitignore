@@ -20,7 +20,7 @@ target/
 # Env
 .env
 .env.*
-
+!.env.example
 
 # --- DB runtime data (NO versionar) ---
 **/mysql-data/
@@ -28,3 +28,22 @@ target/
 **/pgdata/
 **/data/
 **/*.sock
+
+# Docker
+docker-compose.override.yml
+.dockerignore.local
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+*~
+
+# Backups
+*.bak
+*.backup
+*.sql.gz
+backup_*.sql

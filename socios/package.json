@@ -1,0 +1,13 @@
+{
+  "name": "socios-frontend-tests",
+  "version": "1.0.0",
+  "description": "Pruebas E2E para el sistema de gestión de socios",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run --spec 'cypress/e2e/**/*.cy.js'"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.3"
+  }
+}

@@ -58,6 +58,7 @@ export class CuentasService {
     cuenta.socioId = request.socioId;
     cuenta.numeroCuenta = request.numeroCuenta;
     cuenta.tipoCuenta = request.tipoCuenta;
+    cuenta.saldo = request.saldo;
 
     const cuentaActualizada = await this.cuentaRepository.save(cuenta);
     return this.mapToResponse(cuentaActualizada);
@@ -120,11 +121,13 @@ export class CuentasService {
       throw new ConflictException('La cuenta no está activa');
     }
 
-    if (cuenta.saldo < monto) {
+    // Asegurar que el saldo sea número antes de restar
+    const saldoActual = parseFloat(cuenta.saldo.toString());
+    if (saldoActual < monto) {
       throw new ConflictException('Saldo insuficiente');
     }
 
-    cuenta.saldo -= monto;
+    cuenta.saldo = saldoActual - monto;
     const cuentaActualizada = await this.cuentaRepository.save(cuenta);
     return this.mapToResponse(cuentaActualizada);
   }
@@ -142,7 +145,8 @@ export class CuentasService {
       throw new ConflictException('La cuenta no está activa');
     }
 
-    cuenta.saldo += monto;
+    // Asegurar que el saldo sea número antes de sumar
+    cuenta.saldo = parseFloat(cuenta.saldo.toString()) + monto;
     const cuentaActualizada = await this.cuentaRepository.save(cuenta);
     return this.mapToResponse(cuentaActualizada);
   }

@@ -1,0 +1,49 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Build
+dist/
+build/
+
+# Tests
+coverage/
+*.spec.ts
+test/
+cypress/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docs
+*.md
+!README.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Misc
+.env
+.env.*
+!.env.example
+*.log
+mysql-data/

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -60,5 +61,12 @@ public class SocioController {
     public ResponseEntity<SocioResponseDTO> buscarPorIdentificacion(
             @PathVariable String identificacion) {
         return ResponseEntity.ok(socioService.obtenerSocioPorIdentificacion(identificacion));
+    }
+
+    @DeleteMapping("/limpiar-todo")
+    @Operation(summary = "Eliminar todos los socios (solo para pruebas)")
+    public ResponseEntity<Map<String, String>> limpiarTodo() {
+        socioService.eliminarTodos();
+        return ResponseEntity.ok(Map.of("message", "Todos los socios han sido eliminados"));
     }
 }
