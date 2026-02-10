@@ -9,13 +9,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias (incluyendo devDependencies para build)
-RUN npm ci --only=production=false
+RUN npm ci
 
 # Copiar código fuente
 COPY . .
 
 # Build de producción
-RUN npm run build
+RUN npm run build && ls -la /app/dist
 
 # ============================================
 # Stage 2: Production
@@ -31,7 +31,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar solo dependencias de producción
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copiar build desde stage anterior
 COPY --from=builder /app/dist ./dist
@@ -56,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:3000/api-docs || exit 1
 
 # Comando de inicio
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
